@@ -1,0 +1,24 @@
+Package: shinyEDA
+Title: General Exploratory Data Analysis Shiny App
+Version: 0.99.0
+Authors@R: person("Paul", "Ruiz", role = c("aut", "cre"), email = "ruizpint@qut.edu.au")
+Description: Modular Shiny application for upload-driven exploratory data analysis.
+License: MIT
+Encoding: UTF-8
+Depends:
+    R (>= 4.0)
+Imports:
+    shiny,
+    bslib,
+    DT,
+    ggplot2,
+    dplyr,
+    tidyr,
+    openxlsx,
+    jsonlite,
+    htmltools,
+    scales,
+    rpart
+Suggests:
+    shinylive,
+    httpuv
