@@ -17,6 +17,8 @@ shiny::runApp(".")
 
 Upload a CSV, TXT, XLSX, or XLS dataset in **Setup**. For multi-sheet Excel workbooks, the app detects available sheets and prefers sheets with names such as `combined`, `all`, or `complete` when present.
 
+The Setup page also includes a lightweight example dataset, `datasets::iris`, so the deployed app can be tested without uploading a file.
+
 The active uploaded file is retained in the Shiny session and shown in the **Current dataset** status in Setup. Browser file-picker controls may appear blank after navigation or refresh-like UI events; use the status box and preview table as the source of truth for the active dataset.
 
 ## App Structure

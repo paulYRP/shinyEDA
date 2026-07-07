@@ -18,6 +18,24 @@ readUploadedData <- function(path, ext, sheet = NULL) {
   shiny::validate(shiny::need(FALSE, "Upload a .csv, .txt, .xlsx or .xls file."))
 }
 
+# Purpose: Return available packaged example datasets.
+# Arguments: None.
+# Returns: Named character vector of example dataset keys.
+getExampleDatasets <- function() {
+  c("Iris - datasets package" = "datasets::iris")
+}
+
+# Purpose: Load a lightweight packaged example dataset.
+# Arguments: Example dataset key.
+# Returns: Data frame.
+loadExampleDataset <- function(exampleKey) {
+  if (identical(exampleKey, "datasets::iris")) {
+    return(as.data.frame(datasets::iris))
+  }
+
+  shiny::validate(shiny::need(FALSE, "Select a valid example dataset."))
+}
+
 # Purpose: Read workbook sheet names safely.
 # Arguments: Uploaded file path and extension.
 # Returns: Character vector of sheet names, or "1" for non-Excel files.

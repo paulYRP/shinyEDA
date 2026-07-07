@@ -38,8 +38,7 @@ dictionaryServer <- function(id, cleanData, params, outliers = NULL, fileName = 
       shiny::req(cleanData())
       metadata <- if (is.null(dictionaryMetadata)) NULL else dictionaryMetadata()
       variableDictionarySummary(cleanData(), metadata)
-    }) |>
-      shiny::bindCache(cleanData(), if (is.null(dictionaryMetadata)) NULL else dictionaryMetadata())
+    })
 
     exportTables <- shiny::reactive({
       shiny::req(cleanData())
@@ -49,8 +48,7 @@ dictionaryServer <- function(id, cleanData, params, outliers = NULL, fileName = 
       }
       metadata <- if (is.null(dictionaryMetadata)) NULL else dictionaryMetadata()
       buildEdaExportTables(cleanData(), outlierValue, metadata)
-    }) |>
-      shiny::bindCache(cleanData(), if (is.null(outliers)) NULL else outliers(), if (is.null(dictionaryMetadata)) NULL else dictionaryMetadata())
+    })
 
     output$dictionaryTable <- DT::renderDT({
       DT::datatable(dictionaryTable(), options = list(scrollX = TRUE, pageLength = 15))

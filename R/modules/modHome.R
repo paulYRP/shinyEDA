@@ -41,6 +41,14 @@ homeUi <- function(id) {
           class = "resource-link",
           shiny::span(class = "resource-circle", shiny::icon("book-open")),
           shiny::span(class = "resource-title", "Reference")
+        ),
+        shiny::tags$a(
+          href = "https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html",
+          target = "_blank",
+          rel = "noopener noreferrer",
+          class = "resource-link",
+          shiny::span(class = "resource-circle datasets-circle", shiny::span(class = "datasets-wordmark", "R")),
+          shiny::span(class = "resource-title", "R")
         )
       )
     ),

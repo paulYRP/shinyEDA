@@ -11,6 +11,11 @@ dataUi <- function(id) {
       bslib::card(
         bslib::card_header("Inputs"),
         shiny::fileInput(ns("dataFile"), "Upload dataset", accept = c(".csv", ".txt", ".xlsx", ".xls")),
+        shiny::div(
+          class = "example-row",
+          shiny::selectInput(ns("exampleData"), "Example dataset", choices = getExampleDatasets(), selected = "datasets::iris", selectize = FALSE),
+          shiny::actionButton(ns("loadExample"), "Load example")
+        ),
         shiny::p(class = "input-note", "Upload another file to replace the active session dataset."),
         shiny::uiOutput(ns("currentDataset")),
         shiny::selectInput(ns("sheetName"), "Excel sheet", choices = c("First sheet" = "1"), selected = "1", selectize = FALSE),
@@ -54,6 +59,27 @@ dataServer <- function(id) {
       unlink(sessionDir, recursive = TRUE, force = TRUE)
     })
 
+    shiny::observeEvent(input$loadExample, {
+      unlink(list.files(sessionDir, full.names = TRUE), recursive = TRUE, force = TRUE)
+      exampleKey <- input$exampleData
+      exampleLabel <- names(getExampleDatasets())[match(exampleKey, getExampleDatasets())]
+      if (is.na(exampleLabel)) {
+        exampleLabel <- exampleKey
+      }
+
+      fileState(list(
+        source = "example",
+        exampleKey = exampleKey,
+        name = paste0(gsub("[^A-Za-z0-9]+", "", exampleLabel), ".csv"),
+        label = exampleLabel,
+        size = NA_real_,
+        ext = "example"
+      ))
+
+      shiny::updateSelectInput(session, "sheetName", choices = c("Not used for example data" = "1"), selected = "1")
+      shiny::updateSelectInput(session, "dictionarySheet", choices = c("None" = ""), selected = "")
+    })
+
     shiny::observeEvent(input$dataFile, {
       shiny::req(input$dataFile)
       ext <- tools::file_ext(input$dataFile$name)
@@ -62,6 +88,7 @@ dataServer <- function(id) {
       file.copy(input$dataFile$datapath, savedPath, overwrite = TRUE)
 
       fileState(list(
+        source = "upload",
         path = savedPath,
         name = input$dataFile$name,
         size = input$dataFile$size,
@@ -85,6 +112,10 @@ dataServer <- function(id) {
     rawData <- shiny::reactive({
       activeFile <- fileState()
       shiny::req(activeFile)
+      if (identical(activeFile$source, "example")) {
+        return(loadExampleDataset(activeFile$exampleKey))
+      }
+
       sheet <- input$sheetName
       if (is.null(sheet) || !nzchar(trimws(sheet))) {
         sheet <- 1
@@ -92,8 +123,7 @@ dataServer <- function(id) {
         sheet <- as.integer(sheet)
       }
       readUploadedData(activeFile$path, activeFile$ext, sheet)
-    }) |>
-      shiny::bindCache(fileState(), input$sheetName)
+    })
 
     output$currentDataset <- shiny::renderUI({
       activeFile <- fileState()
@@ -102,6 +132,15 @@ dataServer <- function(id) {
       }
 
       shiny::req(rawData())
+      if (identical(activeFile$source, "example")) {
+        return(shiny::div(
+          class = "dataset-status",
+          shiny::strong(activeFile$label),
+          shiny::tags$span("Source: datasets package"),
+          shiny::tags$span(paste0(nrow(rawData()), " rows x ", ncol(rawData()), " columns"))
+        ))
+      }
+
       shiny::div(
         class = "dataset-status",
         shiny::strong(activeFile$name),
@@ -132,9 +171,12 @@ dataServer <- function(id) {
     dictionaryMetadata <- shiny::reactive({
       activeFile <- fileState()
       shiny::req(activeFile)
+      if (identical(activeFile$source, "example")) {
+        return(NULL)
+      }
+
       readDictionaryMetadata(activeFile$path, activeFile$ext, input$dictionarySheet)
-    }) |>
-      shiny::bindCache(fileState(), input$dictionarySheet)
+    })
 
     cleanData <- shiny::reactive({
       shiny::req(rawData())
@@ -154,8 +196,7 @@ dataServer <- function(id) {
         dat <- convertFactorVars(dat, input$factorVars)
         dat
       })
-    }) |>
-      shiny::bindCache(rawData(), input$abnormalValues, input$numericVars, input$integerVars, input$factorVars, input$birthdateVar, input$dateOrigin, input$ageVar)
+    })
 
     params <- shiny::reactive({
       activeFile <- fileState()

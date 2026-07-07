@@ -42,8 +42,7 @@ outliersServer <- function(id, cleanData, fileName = NULL) {
       shiny::withProgress(message = "Detecting outliers", value = 0.5, {
         detectOutliers(data, input$t3, input$tH, input$tb)
       })
-    }) |>
-      shiny::bindCache(cleanData(), input$t3, input$tH, input$tb)
+    })
 
     outlierPlot <- shiny::reactive({
       plotOutlierSummary(outliers()$summary)
