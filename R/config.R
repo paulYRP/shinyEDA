@@ -22,11 +22,13 @@ loadAppPackages <- function() {
 appTheme <- function(mode = "light") {
   mode <- match.arg(mode, c("light", "dark"))
 
+  appFont <- bslib::font_collection("Roboto", "Arial", "sans-serif")
+
   if (identical(mode, "dark")) {
-    return(bslib::bs_theme(version = 5, bootswatch = "darkly", primary = "#72c6ca", base_font = bslib::font_google("Roboto")))
+    return(bslib::bs_theme(version = 5, bootswatch = "darkly", primary = "#72c6ca", base_font = appFont))
   }
 
-  bslib::bs_theme(version = 5, bootswatch = "flatly", primary = "#2f6f73", base_font = bslib::font_google("Roboto"))
+  bslib::bs_theme(version = 5, bootswatch = "flatly", primary = "#2f6f73", base_font = appFont)
 }
 
 # Purpose: Return raster resolution for in-app plot previews.
