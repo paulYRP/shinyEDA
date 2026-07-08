@@ -5,32 +5,35 @@ categoricalUi <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::h3("Categorical variables"),
-    bslib::layout_columns(
-      col_widths = c(4, 8),
-      bslib::card(
-        bslib::card_header("Controls"),
-        shiny::selectInput(ns("catVar"), "Categorical variable", choices = NULL),
-        shiny::selectInput(ns("groupVar"), "Group for numeric boxplot", choices = NULL),
-        shiny::selectInput(ns("numericVar"), "Numeric variable for boxplot", choices = NULL),
-        shiny::selectizeInput(ns("questionVars"), "Question response variables", choices = NULL, multiple = TRUE),
-        shiny::selectInput(ns("imageFormat"), "Plot download format", choices = c("png", "jpg", "tiff")),
-        shiny::downloadButton(ns("downloadPlot"), "Download plot")
-      ),
-      bslib::card(
-        bslib::card_header("Categorical distribution"),
-        shiny::plotOutput(ns("catPlot"), height = 360),
-        DT::DTOutput(ns("catTable")),
-        shiny::downloadButton(ns("downloadTable"), "Download categorical table")
-      )
+    controlCard(
+      dropdownInput(ns("catVar"), "Category Variable", choices = NULL),
+      dropdownInput(ns("groupVar"), "Group Variable", choices = NULL),
+      dropdownInput(ns("numericVar"), "Numeric Variable", choices = NULL),
+      dropdownInput(ns("responseSet"), "Response Set", choices = c("Custom" = "custom")),
+      checkboxDropdownInput(ns("responseVars"), "Response Columns", choices = NULL, placeholder = "Select columns"),
+      dropdownInput(ns("imageFormat"), "Plot Format", choices = c("png", "jpg", "tiff")),
+      shiny::downloadButton(ns("downloadPlot"), "Download plot", class = "control-action")
     ),
-    bslib::card(
-      bslib::card_header("Numeric variable by group"),
-      shiny::plotOutput(ns("boxPlot"), height = 380)
+    expandablePlotCard(
+      "Categorical distribution",
+      ns("catPlot"),
+      ns("expandCat"),
+      height = 360,
+      DT::DTOutput(ns("catTable")),
+      shiny::downloadButton(ns("downloadTable"), "Download categorical table")
     ),
-    bslib::card(
-      bslib::card_header("Question responses"),
-      shiny::plotOutput(ns("questionPlot"), height = 420),
-      shiny::downloadButton(ns("downloadQuestionPlot"), "Download question plot")
+    expandablePlotCard(
+      "Numeric variable by group",
+      ns("boxPlot"),
+      ns("expandBox"),
+      height = 380
+    ),
+    expandablePlotCard(
+      "Response-item distributions",
+      ns("questionPlot"),
+      ns("expandResponse"),
+      height = 420,
+      shiny::downloadButton(ns("downloadQuestionPlot"), "Download response plot")
     )
   )
 }
@@ -54,8 +57,22 @@ categoricalServer <- function(id, cleanData, fileName = NULL) {
       shiny::updateSelectInput(session, "catVar", choices = catVars())
       shiny::updateSelectInput(session, "groupVar", choices = catVars(), selected = if ("gender" %in% catVars()) "gender" else NULL)
       shiny::updateSelectInput(session, "numericVar", choices = numericVars(), selected = if ("weight" %in% numericVars()) "weight" else NULL)
-      questionVars <- intersect(detectQuestionVars(cleanData()), names(cleanData()))
-      shiny::updateSelectizeInput(session, "questionVars", choices = names(cleanData()), selected = questionVars, server = TRUE)
+      choices <- responseSetChoices(cleanData())
+      selectedSet <- defaultResponseSet(cleanData())
+      responseVars <- responseSetVars(cleanData(), selectedSet)
+      shiny::updateSelectInput(session, "responseSet", choices = choices, selected = selectedSet)
+      shiny::updateCheckboxGroupInput(session, "responseVars", choices = names(cleanData()), selected = responseVars)
+    })
+
+    shiny::observeEvent(input$responseSet, {
+      shiny::req(cleanData())
+      if (identical(input$responseSet, "custom")) {
+        shiny::updateCheckboxGroupInput(session, "responseVars", choices = names(cleanData()))
+        return()
+      }
+
+      responseVars <- responseSetVars(cleanData(), input$responseSet)
+      shiny::updateCheckboxGroupInput(session, "responseVars", choices = names(cleanData()), selected = responseVars)
     })
 
     catTable <- shiny::reactive({
@@ -71,16 +88,58 @@ categoricalServer <- function(id, cleanData, fileName = NULL) {
     output$catPlot <- shiny::renderPlot({
       shiny::validate(shiny::need(length(catVars()) > 0, "No categorical variables available."))
       currentPlot()
-    })
+    }, res = appPlotResolution())
+
+    observeExpandedPlot(
+      input,
+      output,
+      session,
+      "expandCat",
+      "catPlotFull",
+      "Categorical distribution",
+      function() {
+        shiny::validate(shiny::need(length(catVars()) > 0, "No categorical variables available."))
+        currentPlot()
+      }
+    )
 
     output$boxPlot <- shiny::renderPlot({
       shiny::req(input$numericVar, input$groupVar)
       plotBoxByGroup(cleanData(), input$numericVar, input$groupVar)
-    })
+    }, res = appPlotResolution())
+
+    observeExpandedPlot(
+      input,
+      output,
+      session,
+      "expandBox",
+      "boxPlotFull",
+      "Numeric variable by group",
+      function() {
+        shiny::req(input$numericVar, input$groupVar)
+        plotBoxByGroup(cleanData(), input$numericVar, input$groupVar)
+      }
+    )
 
     output$questionPlot <- shiny::renderPlot({
-      plotQuestionResponses(cleanData(), input$questionVars)
-    })
+      plotQuestionResponses(cleanData(), input$responseVars, appPreviewFacetLimit())
+    }, res = appPlotResolution())
+
+    observeExpandedPlot(
+      input,
+      output,
+      session,
+      "expandResponse",
+      "questionPlotFull",
+      "Response-item distributions",
+      function() {
+        plotQuestionResponses(cleanData(), input$responseVars)
+      },
+      height = function() {
+        nVars <- length(intersect(input$responseVars, names(cleanData())))
+        paste0(max(760, min(1800, nVars * 45)), "px")
+      }
+    )
 
     output$catTable <- DT::renderDT({
       DT::datatable(catTable(), options = list(scrollX = TRUE, pageLength = 10))
@@ -97,8 +156,8 @@ categoricalServer <- function(id, cleanData, fileName = NULL) {
     )
 
     output$downloadQuestionPlot <- shiny::downloadHandler(
-      filename = function() buildDownloadName(fileName(), "QUESTIONS", input$imageFormat),
-      content = function(file) savePlotFile(plotQuestionResponses(cleanData(), input$questionVars), file, input$imageFormat)
+      filename = function() buildDownloadName(fileName(), "RESPONSES", input$imageFormat),
+      content = function(file) savePlotFile(plotQuestionResponses(cleanData(), input$responseVars), file, input$imageFormat)
     )
   })
 }

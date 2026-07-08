@@ -10,9 +10,11 @@ overviewUi <- function(id) {
       bslib::card(bslib::card_header("Variable structure"), DT::DTOutput(ns("varTable"))),
       bslib::card(bslib::card_header("Abnormal values before cleaning"), DT::DTOutput(ns("abnormalTable")))
     ),
-    bslib::card(
-      bslib::card_header("Missing values"),
-      shiny::plotOutput(ns("missingPlot"), height = 420),
+    expandablePlotCard(
+      "Missing values",
+      ns("missingPlot"),
+      ns("expandMissing"),
+      height = 420,
       DT::DTOutput(ns("missingTable")),
       shiny::downloadButton(ns("downloadMissing"), "Download missing summary")
     )
@@ -44,8 +46,22 @@ overviewServer <- function(id, cleanData, abnormalTable, fileName = NULL) {
 
     output$missingPlot <- shiny::renderPlot({
       shiny::validate(shiny::need(nrow(missingTable()) > 0, "Upload data to inspect missingness."))
-      plotMissingSummary(missingTable())
-    })
+      plotMissingSummary(missingTable(), appPreviewVariableLimit())
+    }, res = appPlotResolution())
+
+    observeExpandedPlot(
+      input,
+      output,
+      session,
+      "expandMissing",
+      "missingPlotFull",
+      "Missing values",
+      function() {
+        shiny::validate(shiny::need(nrow(missingTable()) > 0, "Upload data to inspect missingness."))
+        plotMissingSummary(missingTable())
+      },
+      height = function() paste0(max(760, min(2200, nrow(missingTable()) * 18)), "px")
+    )
 
     output$missingTable <- DT::renderDT({
       DT::datatable(missingTable(), options = list(scrollX = TRUE, pageLength = 12))

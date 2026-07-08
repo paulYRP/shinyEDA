@@ -5,23 +5,14 @@ inliersUi <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::h3("Inliers detection"),
-    bslib::card(
-      bslib::card_header("Concept"),
-      shiny::p("There is no single mathematical detection procedure for inliers."),
-      shiny::p("As a practical diagnostic, this page counts repeated values and flags unusually frequent values in a selected variable.")
+    controlCard(
+      dropdownInput(ns("variable"), "Variable", choices = NULL),
+      shiny::numericInput(ns("topN"), "Top Repeated Values", value = 20, min = 5, max = 100, step = 5)
     ),
-    bslib::layout_columns(
-      col_widths = c(4, 8),
-      bslib::card(
-        bslib::card_header("Controls"),
-        shiny::selectInput(ns("variable"), "Variable", choices = NULL),
-        shiny::numericInput(ns("topN"), "Show top repeated values", value = 20, min = 5, max = 100, step = 5)
-      ),
-      bslib::card(
-        bslib::card_header("Repeated values"),
-        DT::DTOutput(ns("repeatTable")),
-        shiny::downloadButton(ns("downloadTable"), "Download repeated-value table")
-      )
+    bslib::card(
+      bslib::card_header("Repeated values"),
+      DT::DTOutput(ns("repeatTable")),
+      shiny::downloadButton(ns("downloadTable"), "Download repeated-value table")
     )
   )
 }

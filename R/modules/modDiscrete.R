@@ -5,20 +5,18 @@ discreteUi <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::h3("Discrete variables"),
-    bslib::layout_columns(
-      col_widths = c(4, 8),
-      bslib::card(
-        bslib::card_header("Controls"),
-        shiny::selectInput(ns("discreteVar"), "Discrete variable", choices = NULL),
-        shiny::selectInput(ns("imageFormat"), "Plot download format", choices = c("png", "jpg", "tiff")),
-        shiny::downloadButton(ns("downloadPlot"), "Download plot")
-      ),
-      bslib::card(
-        bslib::card_header("Frequency and summary"),
-        shiny::plotOutput(ns("freqPlot"), height = 420),
-        DT::DTOutput(ns("discreteTable")),
-        shiny::downloadButton(ns("downloadTable"), "Download discrete table")
-      )
+    controlCard(
+      dropdownInput(ns("discreteVar"), "Discrete Variable", choices = NULL),
+      dropdownInput(ns("imageFormat"), "Plot Format", choices = c("png", "jpg", "tiff")),
+      shiny::downloadButton(ns("downloadPlot"), "Download plot", class = "control-action")
+    ),
+    expandablePlotCard(
+      "Frequency and summary",
+      ns("freqPlot"),
+      ns("expandFreq"),
+      height = 420,
+      DT::DTOutput(ns("discreteTable")),
+      shiny::downloadButton(ns("downloadTable"), "Download discrete table")
     )
   )
 }
@@ -50,7 +48,20 @@ discreteServer <- function(id, cleanData, fileName = NULL) {
     output$freqPlot <- shiny::renderPlot({
       shiny::validate(shiny::need(length(discreteVars()) > 0, "No discrete variables were found."))
       freqPlot()
-    })
+    }, res = appPlotResolution())
+
+    observeExpandedPlot(
+      input,
+      output,
+      session,
+      "expandFreq",
+      "freqPlotFull",
+      "Frequency and summary",
+      function() {
+        shiny::validate(shiny::need(length(discreteVars()) > 0, "No discrete variables were found."))
+        freqPlot()
+      }
+    )
 
     output$discreteTable <- DT::renderDT({
       DT::datatable(discreteTableRx(), options = list(scrollX = TRUE, pageLength = 10))

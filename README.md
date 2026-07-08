@@ -9,17 +9,16 @@ From the repository root:
 ```r
 install.packages(c(
   "shiny", "bslib", "DT", "ggplot2", "dplyr", "tidyr",
-  "openxlsx", "jsonlite", "htmltools", "scales", "rpart"
+  "openxlsx", "jsonlite", "htmltools", "scales", "rpart",
+  "MASS", "lme4", "lmerTest", "performance"
 ))
 
 shiny::runApp(".")
 ```
 
-Upload a CSV, TXT, XLSX, or XLS dataset in **Setup**. For multi-sheet Excel workbooks, the app detects available sheets and prefers sheets with names such as `combined`, `all`, or `complete` when present.
+Upload a CSV, TXT, XLSX, or XLS dataset in **Setup**. For multi-sheet Excel workbooks, the app detects available sheets.
 
-The Setup page also includes a lightweight example dataset, `datasets::iris`, so the deployed app can be tested without uploading a file.
-
-The active uploaded file is retained in the Shiny session and shown in the **Current dataset** status in Setup. Browser file-picker controls may appear blank after navigation or refresh-like UI events; use the status box and preview table as the source of truth for the active dataset.
+The Setup page also includes a lightweight example dataset, `datasets::iris`.
 
 ## App Structure
 
@@ -46,15 +45,15 @@ The left sidebar includes:
 - Characterising variables
 - Outliers detection
 - Inliers detection
+- GLM analysis
+- LME analysis
 - Dictionary
 
 The top-right app bar includes a light/dark display toggle.
 
-Question-response plots auto-detect variables such as `q1`, `q2`, `qA1`, or similar question-style names. The selected question variables can be edited in the categorical sections.
-
 ## GitHub Pages Deployment
 
-Push this repository to GitHub, then enable GitHub Pages with **GitHub Actions** as the source. The included workflow exports the app with `shinylive` and deploys the generated static site.
+The included workflow exports the app with `shinylive` and deploys the generated static site.
 
 To export locally:
 
@@ -84,6 +83,6 @@ Close the workbook in Excel first if it is locked by another process.
 
 ## shinylive Compatibility Notes
 
-The app intentionally uses a compact package set to improve browser-based deployment compatibility: `shiny`, `bslib`, `DT`, `ggplot2`, `dplyr`, `tidyr`, `openxlsx`, `jsonlite`, `htmltools`, `scales`, and `rpart`.
+The app uses `shiny`, `bslib`, `DT`, `ggplot2`, `dplyr`, `tidyr`, `openxlsx`, `jsonlite`, `htmltools`, `scales`, `rpart`, `MASS`, `lme4`, `lmerTest`, and `performance`.
 
 If additional packages are introduced later, confirm that WebAssembly binaries are available for shinylive. webR/shinylive cannot install R packages from source inside the browser.

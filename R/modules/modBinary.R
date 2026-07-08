@@ -5,23 +5,21 @@ binaryUi <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::h3("Binary"),
-    bslib::layout_columns(
-      col_widths = c(4, 8),
-      bslib::card(
-        bslib::card_header("Controls"),
-        shiny::selectInput(ns("binaryVar"), "Binary variable", choices = NULL),
-        shiny::selectInput(ns("targetLevel"), "Target level", choices = NULL),
-        shiny::selectInput(ns("groupVar"), "Group variable", choices = NULL),
-        shiny::numericInput(ns("confLevel"), "Confidence level", value = 0.95, min = 0.5, max = 0.999, step = 0.01),
-        shiny::selectInput(ns("imageFormat"), "Plot download format", choices = c("png", "jpg", "tiff")),
-        shiny::downloadButton(ns("downloadPlot"), "Download plot")
-      ),
-      bslib::card(
-        bslib::card_header("Binary summary"),
-        shiny::plotOutput(ns("binaryPlot"), height = 420),
-        DT::DTOutput(ns("binaryTable")),
-        shiny::downloadButton(ns("downloadTable"), "Download binary table")
-      )
+    controlCard(
+      dropdownInput(ns("binaryVar"), "Binary Variable", choices = NULL),
+      dropdownInput(ns("targetLevel"), "Target Level", choices = NULL),
+      dropdownInput(ns("groupVar"), "Group Variable", choices = NULL),
+      shiny::numericInput(ns("confLevel"), "Confidence Level", value = 0.95, min = 0.5, max = 0.999, step = 0.01),
+      dropdownInput(ns("imageFormat"), "Plot Format", choices = c("png", "jpg", "tiff")),
+      shiny::downloadButton(ns("downloadPlot"), "Download plot", class = "control-action")
+    ),
+    expandablePlotCard(
+      "Binary summary",
+      ns("binaryPlot"),
+      ns("expandBinary"),
+      height = 420,
+      DT::DTOutput(ns("binaryTable")),
+      shiny::downloadButton(ns("downloadTable"), "Download binary table")
     )
   )
 }
@@ -63,7 +61,20 @@ binaryServer <- function(id, cleanData, fileName = NULL) {
     output$binaryPlot <- shiny::renderPlot({
       shiny::validate(shiny::need(length(catVars()) >= 2, "At least two categorical variables are required."))
       binaryPlot()
-    })
+    }, res = appPlotResolution())
+
+    observeExpandedPlot(
+      input,
+      output,
+      session,
+      "expandBinary",
+      "binaryPlotFull",
+      "Binary summary",
+      function() {
+        shiny::validate(shiny::need(length(catVars()) >= 2, "At least two categorical variables are required."))
+        binaryPlot()
+      }
+    )
 
     output$binaryTable <- DT::renderDT({
       DT::datatable(binaryTableRx(), options = list(scrollX = TRUE, pageLength = 12))

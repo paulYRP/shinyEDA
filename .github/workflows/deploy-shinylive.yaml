@@ -29,7 +29,7 @@ jobs:
 
       - name: Install app and export dependencies
         run: |
-          Rscript -e 'install.packages(c("shiny", "bslib", "DT", "ggplot2", "dplyr", "tidyr", "openxlsx", "jsonlite", "htmltools", "scales", "rpart", "shinylive"))'
+          Rscript -e 'install.packages(c("shiny", "bslib", "DT", "ggplot2", "dplyr", "tidyr", "openxlsx", "jsonlite", "htmltools", "scales", "rpart", "MASS", "lme4", "lmerTest", "performance", "shinylive"))'
 
       - name: Export shinylive site
         run: Rscript tools/export-shinylive.R

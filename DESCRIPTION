@@ -1,5 +1,5 @@
 Package: shinyEDA
-Title: General Exploratory Data Analysis Shiny App
+Title: Exploratory Data Analysis Shiny App
 Version: 0.99.0
 Authors@R: person("Paul", "Ruiz", role = c("aut", "cre"), email = "ruizpint@qut.edu.au")
 Description: Modular Shiny application for upload-driven exploratory data analysis.
@@ -18,7 +18,11 @@ Imports:
     jsonlite,
     htmltools,
     scales,
-    rpart
+    rpart,
+    MASS,
+    lme4,
+    lmerTest,
+    performance
 Suggests:
     shinylive,
     httpuv

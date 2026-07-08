@@ -1,7 +1,12 @@
 # Purpose: Plot missing values by variable.
-# Arguments: Missing summary table.
+# Arguments: Missing summary table and optional maximum number of variables.
 # Returns: ggplot object.
-plotMissingSummary <- function(missingTable) {
+plotMissingSummary <- function(missingTable, maxVars = NULL) {
+  if (!is.null(maxVars) && nrow(missingTable) > maxVars) {
+    missingTable <- missingTable[order(missingTable$nMissing, decreasing = TRUE), , drop = FALSE]
+    missingTable <- head(missingTable, maxVars)
+  }
+
   ggplot2::ggplot(missingTable, ggplot2::aes(reorder(variable, nMissing), nMissing)) +
     ggplot2::geom_col(fill = "#4b6cb7") +
     ggplot2::coord_flip() +
@@ -48,21 +53,28 @@ plotCategoricalProportion <- function(data, variable) {
     ggplot2::theme_minimal()
 }
 
-# Purpose: Plot question response proportions.
-# Arguments: Data frame and question variable names.
+# Purpose: Plot response-item proportions.
+# Arguments: Data frame, response-item variable names and optional maximum number of items.
 # Returns: ggplot object.
-plotQuestionResponses <- function(data, questionVars) {
+plotQuestionResponses <- function(data, questionVars, maxVars = NULL) {
   vars <- intersect(questionVars, names(data))
-  shiny::validate(shiny::need(length(vars) > 0, "No question-style columns were found."))
+  shiny::validate(shiny::need(length(vars) > 0, "Select response-style columns to plot."))
+
+  levelCounts <- vapply(data[vars], function(x) length(unique(stats::na.omit(x))), integer(1))
+  vars <- vars[levelCounts > 1 & levelCounts <= 12]
+  shiny::validate(shiny::need(length(vars) > 0, "Selected columns have too many unique values for a response-item plot. Choose Likert or survey-style response columns."))
+  if (!is.null(maxVars) && length(vars) > maxVars) {
+    vars <- head(vars, maxVars)
+  }
 
   plotData <- data |>
-    tidyr::pivot_longer(dplyr::all_of(vars), names_to = "Question", values_to = "Response") |>
-    dplyr::mutate(Question = factor(Question, levels = vars))
+    tidyr::pivot_longer(dplyr::all_of(vars), names_to = "Item", values_to = "Response") |>
+    dplyr::mutate(Item = factor(Item, levels = vars))
 
-  ggplot2::ggplot(plotData, ggplot2::aes(Question, fill = as.factor(Response))) +
+  ggplot2::ggplot(plotData, ggplot2::aes(Item, fill = as.factor(Response))) +
     ggplot2::geom_bar(position = "fill") +
     ggplot2::scale_y_continuous(labels = scales::percent) +
-    ggplot2::labs(title = "Response distribution across questions", y = "Percentage", fill = "Response") +
+    ggplot2::labs(title = "Response distribution across selected items", y = "Percentage", fill = "Response") +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
 }
@@ -127,9 +139,16 @@ plotScatter <- function(data, xVar, yVar, colourVar = NULL, logScale = FALSE) {
 }
 
 # Purpose: Plot outlier counts by method.
-# Arguments: Outlier summary table.
+# Arguments: Outlier summary table and optional maximum number of variables.
 # Returns: ggplot object.
-plotOutlierSummary <- function(outlierSummaryTable) {
+plotOutlierSummary <- function(outlierSummaryTable, maxVars = NULL) {
+  if (!is.null(maxVars) && nrow(outlierSummaryTable) > 0) {
+    topVars <- stats::aggregate(nOut ~ variable, outlierSummaryTable, sum, na.rm = TRUE)
+    topVars <- topVars[order(topVars$nOut, decreasing = TRUE), , drop = FALSE]
+    topVars <- head(topVars$variable, maxVars)
+    outlierSummaryTable <- outlierSummaryTable[outlierSummaryTable$variable %in% topVars, , drop = FALSE]
+  }
+
   ggplot2::ggplot(outlierSummaryTable, ggplot2::aes(variable, nOut, fill = method)) +
     ggplot2::geom_col(position = "dodge") +
     ggplot2::coord_flip() +

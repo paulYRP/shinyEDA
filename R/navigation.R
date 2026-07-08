@@ -9,21 +9,36 @@ getEdaNav <- function() {
       "Exploration", "Exploration", "Exploration", "Exploration",
       "Characterising variables", "Characterising variables",
       "Characterising variables", "Characterising variables",
-      "Outliers detection", "Inliers detection", "Dictionary"
+      "Outliers detection", "Inliers detection",
+      "GLM analysis", "GLM analysis", "GLM analysis", "GLM analysis",
+      "GLM analysis", "GLM analysis",
+      "LME analysis", "LME analysis", "LME analysis", "LME analysis",
+      "LME analysis", "LME analysis",
+      "Dictionary"
     ),
     subsection = c(
       "Home",
       "Setup",
       "Overview", "Numeric variables", "Categorical variables", "Conditioning Variable",
       "Binary", "Categorical variables", "Discrete variables", "Continuous variables",
-      "Outliers detection", "Inliers detection", "Dictionary"
+      "Outliers detection", "Inliers detection",
+      "Prepare data", "PCA and loadings", "Density inspection",
+      "Correlation", "Polynomial", "Generalized Linear Models",
+      "Prepare data", "PCA and loadings", "Density inspection",
+      "Correlation", "Polynomial", "Generalized Linear Mixed Effects Models",
+      "Dictionary"
     ),
     label = c(
       "Home",
       "Setup",
       "Overview", "Numeric variables", "Categorical variables", "Conditioning Variable",
       "Binary", "Categorical variables", "Discrete variables", "Continuous variables",
-      "Outliers detection", "Inliers detection", "Dictionary"
+      "Outliers detection", "Inliers detection",
+      "Prepare data", "PCA and loadings", "Density inspection",
+      "Correlation", "Polynomial", "Generalized Linear Models",
+      "Prepare data", "PCA and loadings", "Density inspection",
+      "Correlation", "Polynomial", "Generalized Linear Mixed Effects Models",
+      "Dictionary"
     ),
     key = c(
       "home",
@@ -31,7 +46,10 @@ getEdaNav <- function() {
       "explorationOverview", "numericVariables", "explorationCategorical",
       "conditioningVariable", "binaryVariables", "characterCategorical",
       "discreteVariables", "continuousVariables", "outliersDetection",
-      "inliersDetection", "dictionary"
+      "inliersDetection",
+      "glmPrepare", "glmPca", "glmDensity", "glmCorrelation", "glmPolynomial", "glmRegression",
+      "lmePrepare", "lmePca", "lmeDensity", "lmeCorrelation", "lmePolynomial", "lmeModels",
+      "dictionary"
     ),
     stringsAsFactors = FALSE
   )

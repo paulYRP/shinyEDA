@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
 html,
 body,
 .bslib-page-fill {
@@ -35,6 +37,7 @@ html[data-bs-theme="dark"] {
 body {
   background: var(--app-bg);
   color: var(--app-text);
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 .app-shell {
@@ -124,10 +127,19 @@ body {
   width: 100%;
 }
 
+.nav-button.active,
 .nav-button:hover,
 .nav-button:focus {
   background: var(--app-primary-soft);
   color: var(--app-primary);
+}
+
+.section-panel {
+  display: none;
+}
+
+.section-panel.section-panel-active {
+  display: block;
 }
 
 .card {
@@ -155,6 +167,359 @@ body {
   margin-bottom: 12px;
 }
 
+.control-card {
+  margin-bottom: 16px;
+  overflow: visible;
+  position: relative;
+  z-index: 20;
+}
+
+.control-card:focus-within {
+  z-index: 2000;
+}
+
+.control-grid {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.control-grid .form-group,
+.control-grid .shiny-input-container {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.control-grid .checkbox {
+  margin: 0;
+}
+
+.control-grid .shiny-input-container > label.control-label,
+.control-grid .form-group > label.control-label {
+  align-items: end;
+  display: flex;
+  min-height: 2.4rem;
+}
+
+.control-grid .form-control:not(textarea),
+.control-grid .form-select,
+.control-grid .selectize-input {
+  height: 42px;
+  min-height: 42px;
+  overflow: auto;
+}
+
+.control-grid .selectize-control {
+  margin-bottom: 0;
+}
+
+.compact-multi-select {
+  min-width: 0;
+  width: 100%;
+}
+
+.checkbox-dropdown {
+  min-width: 0;
+  position: relative;
+  width: 100%;
+}
+
+.checkbox-dropdown-toggle {
+  align-items: center;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-text);
+  display: flex;
+  gap: 8px;
+  height: 42px;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 7px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.checkbox-dropdown-toggle:focus,
+.checkbox-dropdown.is-open .checkbox-dropdown-toggle {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 0.2rem var(--app-primary-soft);
+  outline: 0;
+}
+
+.checkbox-dropdown-summary {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.checkbox-dropdown-arrow {
+  color: var(--app-muted);
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+}
+
+.checkbox-dropdown-menu {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  display: none;
+  left: 0;
+  margin-top: 4px;
+  max-height: 300px;
+  min-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  padding: 8px;
+  position: fixed;
+  top: 100%;
+  width: max-content;
+  z-index: 10000;
+}
+
+.checkbox-dropdown.is-open .checkbox-dropdown-menu {
+  display: block;
+}
+
+.checkbox-dropdown-menu .shiny-options-group {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.checkbox-dropdown-menu .checkbox {
+  margin: 0;
+  min-width: 180px;
+}
+
+.checkbox-dropdown-menu label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  line-height: 1.25;
+  margin: 0;
+  padding: 4px 6px;
+  white-space: nowrap;
+}
+
+.checkbox-dropdown-menu label:hover,
+.checkbox-dropdown-menu label:focus-within {
+  background: var(--app-primary-soft);
+  border-radius: 4px;
+}
+
+.checkbox-dropdown-menu input[type="checkbox"] {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.control-grid .selectize-control.multi .selectize-input {
+  display: block;
+  max-height: 42px;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: nowrap;
+}
+
+.control-grid .selectize-control.multi .selectize-input > div {
+  display: inline-block;
+  float: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.control-grid .selectize-control.single .selectize-input {
+  align-items: center;
+  display: flex;
+}
+
+.control-grid input[type="number"] {
+  min-width: 0;
+}
+
+.control-grid .btn {
+  min-height: 42px;
+}
+
+.control-grid textarea.form-control {
+  height: 96px;
+  min-height: 96px;
+  overflow: auto;
+  resize: vertical;
+}
+
+.selectize-dropdown {
+  z-index: 3000;
+}
+
+.selectize-dropdown-content {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.control-wide {
+  grid-column: span 2;
+}
+
+.control-action {
+  align-self: end;
+}
+
+.control-check-after {
+  align-items: center;
+  display: flex;
+  min-height: 42px;
+}
+
+.control-check-after .form-group,
+.control-check-after .checkbox {
+  margin: 0;
+}
+
+.formula-card pre {
+  background: var(--app-surface-alt);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-text);
+  margin: 0;
+  max-height: 180px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+}
+
+.model-summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.model-summary-card {
+  background: var(--app-surface-alt);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.model-summary-card h4 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.model-summary-card pre {
+  background: transparent;
+  border: 0;
+  color: var(--app-text);
+  font-size: 0.78rem;
+  margin: 0;
+  max-height: 360px;
+  overflow: auto;
+  padding: 0;
+  white-space: pre;
+}
+
+.shiny-bound-output {
+  position: relative;
+}
+
+.shiny-bound-output.recalculating {
+  opacity: 0.58;
+}
+
+.shiny-bound-output.recalculating::after {
+  animation: shinyeda-spin 0.8s linear infinite;
+  border: 3px solid var(--app-border);
+  border-top-color: var(--app-primary);
+  border-radius: 999px;
+  content: "";
+  height: 30px;
+  left: calc(50% - 15px);
+  pointer-events: none;
+  position: absolute;
+  top: calc(50% - 15px);
+  width: 30px;
+  z-index: 30;
+}
+
+@keyframes shinyeda-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.plot-card-header {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.plot-expand-button {
+  align-items: center;
+  background: var(--app-surface-alt);
+  border-color: var(--app-border);
+  color: var(--app-text);
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  padding: 0;
+  width: 34px;
+}
+
+.plot-expand-button:hover,
+.plot-expand-button:focus {
+  background: var(--app-primary-soft);
+  border-color: var(--app-primary);
+  color: var(--app-primary);
+}
+
+.plot-expand-button i,
+.plot-expand-button svg {
+  color: currentColor;
+}
+
+.expanded-plot-wrap {
+  min-height: 640px;
+  width: 100%;
+}
+
+.modal-xl {
+  --bs-modal-width: min(96vw, 1500px);
+}
+
+.home-demo {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 920px;
+}
+
+.home-demo-media {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.home-demo-note {
+  color: var(--app-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
 .example-row {
   display: grid;
   gap: 8px;
@@ -174,6 +539,16 @@ body {
   color: var(--app-muted);
   font-size: 0.88rem;
   margin-top: -8px;
+}
+
+.privacy-note {
+  background: var(--app-primary-soft);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-muted);
+  font-size: 0.9rem;
+  margin: -6px 0 16px;
+  padding: 9px 10px;
 }
 
 .dataset-status {
@@ -299,9 +674,25 @@ html[data-bs-theme="dark"] .datasets-circle {
   color: #9bc1ff;
 }
 
+html[data-bs-theme="dark"] .plot-expand-button {
+  background: #243136;
+  border-color: #5a7077;
+  color: #e8f0f2;
+}
+
+html[data-bs-theme="dark"] .plot-expand-button:hover,
+html[data-bs-theme="dark"] .plot-expand-button:focus {
+  background: rgba(114, 198, 202, 0.2);
+  border-color: #72c6ca;
+  color: #72c6ca;
+}
+
 html[data-bs-theme="dark"] .form-control,
 html[data-bs-theme="dark"] .form-select,
+html[data-bs-theme="dark"] select,
 html[data-bs-theme="dark"] .selectize-input,
+html[data-bs-theme="dark"] .selectize-input.focus,
+html[data-bs-theme="dark"] .selectize-input.dropdown-active,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input,
 html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select {
   background-color: var(--app-surface-alt);
@@ -309,8 +700,24 @@ html[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select {
   color: var(--app-text);
 }
 
-html[data-bs-theme="dark"] .selectize-dropdown {
+html[data-bs-theme="dark"] .selectize-input input {
+  color: var(--app-text);
+}
+
+html[data-bs-theme="dark"] .selectize-dropdown,
+html[data-bs-theme="dark"] .selectize-dropdown .active {
   background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+html[data-bs-theme="dark"] .selectize-dropdown .active {
+  background-color: var(--app-primary-soft);
+}
+
+html[data-bs-theme="dark"] .checkbox-dropdown-toggle,
+html[data-bs-theme="dark"] .checkbox-dropdown-menu {
+  background-color: var(--app-surface-alt);
   border-color: var(--app-border);
   color: var(--app-text);
 }
@@ -343,5 +750,13 @@ html[data-bs-theme="dark"] table.dataTable.display tbody tr.odd {
     margin: -18px -18px 18px;
     min-height: 52px;
     padding: 8px 18px;
+  }
+
+  .control-wide {
+    grid-column: span 1;
+  }
+
+  .model-summary-grid {
+    grid-template-columns: 1fr;
   }
 }

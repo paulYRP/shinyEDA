@@ -1,15 +1,48 @@
+# Purpose: Render one navigation section.
+# Arguments: Namespace function, section name and section rows.
+# Returns: Details block containing section buttons.
+sidebarSectionUi <- function(ns, sectionName, rows) {
+  buttons <- lapply(seq_len(nrow(rows)), function(i) {
+    key <- rows$key[i]
+    shiny::tags$button(
+      id = ns(paste0("nav_", key)),
+      type = "button",
+      class = paste("nav-button", if (identical(key, "home")) "active" else ""),
+      `data-nav-key` = key,
+      `data-nav-label` = paste(rows$section[i], rows$label[i]),
+      `data-nav-input` = ns("selectedKey"),
+      rows$label[i]
+    )
+  })
+
+  shiny::tags$details(
+    open = TRUE,
+    `data-nav-section` = sectionName,
+    shiny::tags$summary(sectionName),
+    buttons
+  )
+}
+
 # Purpose: Render documentation-style navigation sidebar.
-# Arguments: Module id.
+# Arguments: Module id and navigation data frame.
 # Returns: Shiny UI.
-sidebarUi <- function(id) {
+sidebarUi <- function(id, nav = getEdaNav()) {
   ns <- shiny::NS(id)
+  sectionTags <- lapply(unique(nav$section), function(sectionName) {
+    rows <- nav[nav$section == sectionName, , drop = FALSE]
+    sidebarSectionUi(ns, sectionName, rows)
+  })
+
   shiny::tagList(
     shiny::div(
       class = "sidebar-title",
       shiny::h2("shinyEDA")
     ),
-    shiny::textInput(ns("search"), label = NULL, placeholder = "Search sections"),
-    shiny::uiOutput(ns("navUi"))
+    shiny::div(
+      class = "sidebar-search",
+      shiny::textInput(ns("search"), label = NULL, placeholder = "Search sections")
+    ),
+    shiny::div(class = "nav-tree", sectionTags)
   )
 }
 
@@ -18,38 +51,12 @@ sidebarUi <- function(id) {
 # Returns: Reactive selected navigation key.
 sidebarServer <- function(id, nav) {
   shiny::moduleServer(id, function(input, output, session) {
-    selected <- shiny::reactiveVal("home")
-
-    output$navUi <- shiny::renderUI({
-      ns <- session$ns
-      filtered <- filterNav(nav, input$search)
-
-      sectionTags <- lapply(unique(filtered$section), function(sectionName) {
-        rows <- filtered[filtered$section == sectionName, , drop = FALSE]
-        buttons <- lapply(seq_len(nrow(rows)), function(i) {
-          shiny::actionButton(
-            ns(paste0("nav_", rows$key[i])),
-            label = rows$label[i],
-            class = "nav-button"
-          )
-        })
-
-        shiny::tags$details(
-          open = TRUE,
-          shiny::tags$summary(sectionName),
-          buttons
-        )
-      })
-
-      shiny::tagList(sectionTags)
-    })
-
-    shiny::observe({
-      lapply(nav$key, function(key) {
-        shiny::observeEvent(input[[paste0("nav_", key)]], {
-          selected(key)
-        }, ignoreInit = TRUE)
-      })
+    selected <- shiny::reactive({
+      key <- input$selectedKey
+      if (is.null(key) || !key %in% nav$key) {
+        return("home")
+      }
+      key
     })
 
     selected

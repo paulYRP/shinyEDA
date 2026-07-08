@@ -150,10 +150,13 @@ readDictionaryMetadata <- function(path, ext, dictionarySheet) {
 # Arguments: Text entered by the user.
 # Returns: Character vector of abnormal-value tokens.
 parseAbnormalValues <- function(text) {
-  if (is.null(text) || !nzchar(trimws(text))) {
+  if (is.null(text) || length(text) == 0 || all(!nzchar(trimws(as.character(text))))) {
     return(character(0))
   }
-  trimws(unlist(strsplit(text, ",", fixed = TRUE)))
+
+  values <- unlist(strsplit(as.character(text), ",", fixed = TRUE), use.names = FALSE)
+  values <- trimws(values)
+  unique(values[nzchar(values)])
 }
 
 # Purpose: Replace configured abnormal-value tokens with NA.
@@ -243,7 +246,9 @@ convertFactorVars <- function(data, vars) {
 # Arguments: Data frame, date variable, Excel origin date.
 # Returns: Data frame with converted date variable.
 convertDateVar <- function(data, dateVar, origin = "1899-12-30") {
-  if (is.null(dateVar) || !dateVar %in% names(data)) {
+  dateVar <- scalarText(dateVar)
+  origin <- scalarText(origin, "1899-12-30")
+  if (!hasScalarText(dateVar) || !dateVar %in% names(data)) {
     return(data)
   }
 
@@ -267,7 +272,9 @@ convertDateVar <- function(data, dateVar, origin = "1899-12-30") {
 # Arguments: Data frame, birthdate variable, output variable name.
 # Returns: Data frame with age column if possible.
 addAgeFromBirthdate <- function(data, birthdateVar, outputVar = "Age") {
-  if (is.null(birthdateVar) || !birthdateVar %in% names(data)) {
+  birthdateVar <- scalarText(birthdateVar)
+  outputVar <- scalarText(outputVar, "Age")
+  if (!hasScalarText(birthdateVar) || !birthdateVar %in% names(data)) {
     if (outputVar %in% names(data) && is.numeric(data[[outputVar]]) &&
         all(is.na(data[[outputVar]]) | data[[outputVar]] == floor(data[[outputVar]]))) {
       data[[outputVar]] <- as.integer(data[[outputVar]])

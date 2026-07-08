@@ -5,26 +5,21 @@ dictionaryUi <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny::h3("Dictionary"),
-    shiny::p("Review variable metadata and download reproducible output tables."),
+    controlCard(
+      shiny::downloadButton(ns("downloadDictionary"), "Dictionary CSV", class = "control-action"),
+      shiny::downloadButton(ns("downloadLog"), "Parameter log", class = "control-action"),
+      shiny::downloadButton(ns("downloadWorkbook"), "Workbook XLSX", class = "control-action")
+    ),
     bslib::layout_columns(
       col_widths = c(7, 5),
       bslib::card(
         bslib::card_header("Variable dictionary"),
-        DT::DTOutput(ns("dictionaryTable")),
-        shiny::hr(),
-        shiny::downloadButton(ns("downloadDictionary"), "Download dictionary CSV")
+        DT::DTOutput(ns("dictionaryTable"))
       ),
       bslib::card(
         bslib::card_header("Selected parameters"),
-        DT::DTOutput(ns("parameterTable")),
-        shiny::hr(),
-        shiny::downloadButton(ns("downloadLog"), "Download parameter log")
+        DT::DTOutput(ns("parameterTable"))
       )
-    ),
-    bslib::card(
-      bslib::card_header("Complete workbook"),
-      shiny::p("Workbook includes summary, binary, categorical, discrete, numeric, outlier and column-definition sheets when available."),
-      shiny::downloadButton(ns("downloadWorkbook"), "Download workbook")
     )
   )
 }
